@@ -66,6 +66,6 @@ class Kernel extends HttpKernel
 
         'isLogin' => \App\Http\Middleware\IsLogin::class,
         'role' => \App\Http\Middleware\RoleMiddleware::class
-        
+
     ];
 }

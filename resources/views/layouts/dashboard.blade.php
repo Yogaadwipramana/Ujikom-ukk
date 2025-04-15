@@ -21,12 +21,11 @@
         <div class="card p-4 shadow-sm border-0 mb-4">
             <h5 class="text-center mb-4">Statistik Penjualan & Stok Produk</h5>
             <div class="row">
-                <!-- Chart Penjualan -->
+                {{-- batang --}}
                 <div class="col-md-6 mb-4">
                     <canvas id="salesChart" height="250"></canvas>
                 </div>
-
-                <!-- Chart Stok Produk -->
+                {{-- pie --}}
                 <div class="col-md-4 mb-4">
                     <canvas id="productChart" height="100"></canvas>
                 </div>
@@ -37,7 +36,6 @@
             const salesLabels = {!! json_encode($salesLabels ?? []) !!};
             const salesCounts = {!! json_encode($salesCounts ?? []) !!};
 
-            // Array warna yang dapat diubah sesuai kebutuhan
             const colors = [
                 'rgba(75, 192, 192, 0.7)', 'rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)',
                 'rgba(255, 159, 64, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 205, 86, 0.7)',
@@ -45,7 +43,6 @@
                 'rgba(255, 159, 64, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 205, 86, 0.7)'
             ];
 
-            // Pastikan jumlah warna sesuai dengan jumlah data
             const backgroundColors = salesLabels.map((_, index) => colors[index % colors.length]);
 
             const ctx = document.getElementById('salesChart').getContext('2d');
@@ -57,8 +54,8 @@
                     datasets: [{
                         label: 'Total Penjualan (Rp)',
                         data: salesCounts.map(Number),
-                        backgroundColor: backgroundColors, // Warna yang berbeda untuk setiap bar
-                        borderColor: 'rgba(0, 0, 0, 0.1)', // Optional: border untuk setiap bar
+                        backgroundColor: backgroundColors,
+                        borderColor: 'rgba(0, 0, 0, 0.1)',
                         borderWidth: 1,
                         borderRadius: 5,
                     }]

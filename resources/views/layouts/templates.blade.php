@@ -153,9 +153,8 @@
 </head>
 
 <body>
-
     <div class="sidebar">
-        <h4>FlexyLite</h4>
+        <h4>Toko Jaya Abadi</h4>
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -168,11 +167,11 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('orders.index') }}" class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
+                <a href="{{ route('orders.index')}}" class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
                     <i class="fa-solid fa-cart-shopping"></i> Pembelian
                 </a>
-            </li>  
-            @if(Auth::user()->role === 'admin')         
+            </li>
+            @if(Auth::user()->role === 'admin')
             <li class="nav-item">
                 <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-user"></i> User
@@ -181,7 +180,7 @@
             @endif
         </ul>
     </div>
-    
+
 
     <div class="content">
         <nav class="navbar d-flex justify-content-between">
@@ -207,7 +206,6 @@
         @yield('content')
     </div>
 
-    <!-- Modal Search -->
     <div id="searchModal" class="search-modal">
         <button class="close-search" onclick="toggleSearch()">X</button>
         <input type="text" id="searchInput" placeholder="Cari...">

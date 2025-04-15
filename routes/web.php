@@ -20,7 +20,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['isLogin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
-    // Rute hanya untuk Admin
+    // Rute untuk Admin
     Route::middleware('role:admin')->group(function () {
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index'])->name('users.index');
@@ -49,21 +49,11 @@ Route::middleware(['isLogin'])->group(function () {
             Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
             Route::get('/member', [OrderController::class, 'memberPage'])->name('orders.member');
             Route::post('/members/save', [OrderController::class, 'save'])->name('members.save');
-
-            // ✅ Ubah jadi GET dan sesuaikan URL
             Route::get('/create/summary', [OrderController::class, 'checkout'])->name('orders.checkout');
-
-            // Route::post('/checkout/process', [OrderController::class, 'processCheckout'])->name('checkout.process');
-            // Route::post('/checkout/process', [OrderController::class, 'processCheckout'])->name('orders.processCheckout');
-
-            // Route::get('/{order}/download', [OrderController::class, 'downloadReceipt'])->name('orders.downloadReceipt');
             Route::get('/orders/search', [OrderController::class, 'search'])->name('orders.search');
             Route::get('/export', [OrderController::class, 'export'])->name('orders.export');
             Route::get('/orders/detail-print/{id}', [OrderController::class, 'detailPrint'])->name('orders.detailPrint');
-            // Route::get('/orders/member', [OrderController::class, 'member'])->name('orders.member');
             Route::post('/orders/member/store', [OrderController::class, 'toMemberPage'])->name('orders.member.store');
-            Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
-            // Route::post('/orders/member/store', [OrderController::class, 'toMemberPage'])->name('orders.member.store');
             Route::get('/orders/{id}', [OrderController::class, 'show']);
             Route::get('/struk/{id}', [OrderController::class, 'cetakStruk'])->name('orders.struk');
 
