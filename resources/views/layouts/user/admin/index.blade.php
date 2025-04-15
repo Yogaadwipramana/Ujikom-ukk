@@ -31,7 +31,10 @@
                 <li class="breadcrumb-item active" aria-current="page">User</li>
             </ol>
         </nav>
-        <a href="{{ route('users.create') }}" class="btn btn-primary btn-sm px-4">+ Tambah User</a>
+        <div>
+            <a href="{{ route('users.create') }}" class="btn btn-primary btn-sm px-4">+ Tambah User</a>
+            <a href="{{ route('users.export') }}" class="btn btn-success btn-sm px-4">Export</a>
+        </div>
     </div>
 
     @if(session('success'))
@@ -52,45 +55,54 @@
                 </thead>
 
                 <tbody>
+                    {{-- @php
+                        // Periksa apakah ada user dengan role "admin"
+                        $hasAdmin = $users->contains(function ($user) {
+                            return $user->role === 'admin';
+                        });
+                    @endphp --}}
+
+
                     @foreach ($users as $index => $user)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td>{{ $user->name }}</td>
-                            <td><span class="badge bg-primary">{{ ucfirst($user->role) }}</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <a href="{{ route('users.edit', $user->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                        @if ($user->role !== 'admin') <!-- Hanya tampilkan jika role bukan admin -->
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $user->email }}</td>
+                                <td>{{ $user->name }}</td>
+                                <td><span class="badge bg-primary">{{ ucfirst($user->role) }}</span></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-warning btn-sm">Edit</a>
 
-                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal{{ $user->id }}">
-                                        Hapus
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal{{ $user->id }}">
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
 
-                        <div class="modal fade" id="deleteConfirmModal{{ $user->id }}" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title text-danger">Konfirmasi Hapus</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body text-center">
-                                        <p>Apakah Anda yakin ingin menghapus user <strong>{{ $user->name }}</strong>?</p>
-                                    </div>
-                                    <div class="modal-footer d-flex justify-content-center">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">Ya, Hapus</button>
-                                        </form>
+                            <div class="modal fade" id="deleteConfirmModal{{ $user->id }}" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-danger">Konfirmasi Hapus</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center">
+                                            <p>Apakah Anda yakin ingin menghapus user <strong>{{ $user->name }}</strong>?</p>
+                                        </div>
+                                        <div class="modal-footer d-flex justify-content-center">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                            <form action="{{ route('users.destroy', $user->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
+                        @endif
                     @endforeach
                 </tbody>
             </table>

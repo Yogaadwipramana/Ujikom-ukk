@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\ProductsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
@@ -100,6 +102,11 @@ class ProductController extends Controller
     ]);
 
     return redirect()->route('products.index')->with('success', 'Stok produk berhasil diperbarui!');
+}
+
+public function export()
+{
+    return Excel::download(new ProductsExport, 'products.xlsx');
 }
 
 }

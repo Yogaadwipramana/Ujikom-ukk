@@ -39,9 +39,12 @@
             </ol>
         </nav>
 
-        @if(auth()->user()->role === 'admin')
-            <a href="{{ route('products.create') }}" class="btn btn-primary btn-sm px-4">+ Tambah Produk</a>
-        @endif
+        <div>
+            @if(auth()->user()->role === 'admin')
+                <a href="{{ route('products.create') }}" class="btn btn-primary btn-sm px-4">+ Tambah Produk</a>
+                <a href="{{ route('products.export') }}" class="btn btn-success btn-sm px-4">Export</a>
+            @endif
+        </div>
     </div>
 
     @if(session('success'))

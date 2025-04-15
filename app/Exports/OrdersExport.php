@@ -22,54 +22,46 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping, WithSty
 
     public function map($order): array
     {
-        $produkData = '-';
+        $rows = [];
+        $productIds = json_decode($order->products_id, true) ?? [];
+        $quantities = json_decode($order->total_barang, true) ?? [];
+        $prices = json_decode($order->total_harga, true) ?? [];
 
-        if (!empty($order->products_id)) {
-            $productIds = json_decode($order->products_id, true);
-            $quantities = json_decode($order->total_barang, true);
-            $prices = json_decode($order->total_harga, true);
+        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
 
-            $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+        foreach ($productIds as $index => $productId) {
+            $product = $products[$productId] ?? null;
 
-            $combined = [];
-
-            foreach ($productIds as $index => $productId) {
-                $product = $products[$productId] ?? null;
-                if ($product) {
-                    $qty = $quantities[$index] ?? 0;
-                    $price = $prices[$index] ?? 0;
-                    $combined[] = "{$product->name} ({$qty} - Rp. " . number_format($price, 0, ',', '.') . ")";
-                }
-            }
-
-            if (!empty($combined)) {
-                $produkData = implode(', ', $combined);
-            }
+            $rows[] = [
+                $index === 0 ? ($order->member->name ?? '-') : '', // Nama Pelanggan hanya di baris pertama
+                $index === 0 ? ($order->member->no_telepon ?? '-') : '', // No Telepon hanya di baris pertama
+                $index === 0 ? ($order->member->point ?? 0) : '', // Point hanya di baris pertama
+                $product ? $product->name : '-', // Nama Produk
+                $quantities[$index] ?? 0, // Jumlah
+                $product ? 'Rp. ' . number_format($prices[$index] ?? 0, 0, ',', '.') : '-', // Harga
+                $index === 0 ? 'Rp. ' . number_format($order->customer_pay, 0, ',', '.') : '', // Bayar hanya di baris pertama
+                $index === 0 ? 'Rp. ' . number_format($order->customer_return, 0, ',', '.') : '', // Kembalian hanya di baris pertama
+                $index === 0 ? 'Rp. ' . number_format($order->total_harga_after_point, 0, ',', '.') : '', // Total Harga Setelah Point hanya di baris pertama
+                $index === 0 ? $order->tanggal_penjualan : '', // Tanggal Penjualan hanya di baris pertama
+            ];
         }
 
-        return [
-            $order->member->name ?? '-',
-            $order->member->no_telepon ?? '-',
-            $order->member->point ?? 0,
-            $produkData,
-            'Rp. ' . number_format($order->customer_pay, 0, ',', '.'),
-            'Rp. ' . number_format($order->customer_return, 0, ',', '.'),
-            'Rp. ' . number_format($order->total_harga_after_point, 0, ',', '.'),
-            $order->tanggal_penjualan,
-        ];
+        return $rows;
     }
 
     public function headings(): array
     {
         return [
             [
-                'Toko Jaya Abadi', '', '', '', '', '', '', '' // Merge ini dilakukan via AfterSheet
+                'Toko Jaya Abadi', '', '', '', '', '', '', '', '', '' // Merge ini dilakukan via AfterSheet
             ],
             [
                 "Nama Pelanggan",
                 "No Telepon",
                 "Point",
-                "Produk (Jumlah - Harga)",
+                "Nama Produk",
+                "Jumlah",
+                "Harga",
                 "Bayar",
                 "Kembalian",
                 "Total Harga Setelah Point",
@@ -81,7 +73,7 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping, WithSty
     public function styles(Worksheet $sheet)
     {
         // Styling judul toko di baris 1
-        $sheet->getStyle('A1:H1')->applyFromArray([
+        $sheet->getStyle('A1:J1')->applyFromArray([
             'font' => ['bold' => true, 'size' => 16],
             'alignment' => [
                 'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
@@ -89,7 +81,7 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping, WithSty
         ]);
 
         // Styling header di baris ke-2
-        $sheet->getStyle('A2:H2')->applyFromArray([
+        $sheet->getStyle('A2:J2')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -98,6 +90,23 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping, WithSty
         ]);
 
         $sheet->getRowDimension(2)->setRowHeight(25);
+
+        // Aktifkan wrap text dan atur alignment untuk kolom produk
+        $sheet->getStyle('D')->applyFromArray([
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                'wrapText' => true,
+            ],
+        ]);
+
+        // Atur alignment untuk semua kolom agar berada di tengah
+        $sheet->getStyle('A:J')->applyFromArray([
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ]);
 
         return [];
     }
@@ -108,11 +117,13 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping, WithSty
             'A' => 20,
             'B' => 15,
             'C' => 10,
-            'D' => 50,
-            'E' => 20,
-            'F' => 20,
-            'G' => 25,
+            'D' => 30,
+            'E' => 10,
+            'F' => 15,
+            'G' => 20,
             'H' => 20,
+            'I' => 25,
+            'J' => 20,
         ];
     }
 
@@ -120,7 +131,8 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping, WithSty
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                $event->sheet->mergeCells('A1:H1');
+                // Merge judul di baris 1
+                $event->sheet->mergeCells('A1:J1');
             },
         ];
     }

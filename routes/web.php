@@ -29,6 +29,7 @@ Route::middleware(['isLogin'])->group(function () {
             Route::get('/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
             Route::put('/{id}', [UserController::class, 'update'])->name('users.update');
             Route::delete('/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+            Route::get('/export', [UserController::class, 'export'])->name('users.export');
         });
     });
 
@@ -41,6 +42,7 @@ Route::middleware(['isLogin'])->group(function () {
             Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
             Route::put('/{product}', [ProductController::class, 'update'])->name('products.update');
             Route::delete('/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+            Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
         });
 
         Route::prefix('orders')->group(function () {

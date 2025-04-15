@@ -142,9 +142,8 @@ class OrderController extends Controller
                 $member->point -= $diskonPoint;
             }
 
-            if ($totalHargaAfterDiskon > 50000) {
-                $member->point += 100;
-            }
+            $poinTambahan = $totalHargaAfterDiskon * 0.01;
+            $member->point += $poinTambahan;
 
             $member->save();
 
@@ -382,8 +381,8 @@ class OrderController extends Controller
             return $item['quantity'] * $item['price'];
         });
 
-        // Hitung point jika total >= 50000
-        $point = $totalHarga >= 50000 ? 10000 : 0;
+        // Hitung poin berdasarkan 1% dari total pembelanjaan
+        $point = $totalHarga * 0.01;
 
         // Simpan ke session untuk digunakan di halaman member
         session([
